@@ -3,14 +3,16 @@ const User = require('../modeles/userModele');
 
 const registerUser = async (req, res) => {
     try {
+        console.log('prischlo')
         const { username, password } = req.body;
         if (!username || !password) {
             return res.status(400).send('UserName and Password are required!');
         }
         const hashedPassword = await bcrypt.hash(password, 10);
-        const user = new User({ username, password: hashedPassword });
+        const user = new User({ username: username, password: hashedPassword });
         await user.save();
         res.status(201).send('User register successfully!');
+        
     } catch (error) {
         res.status(500).send('Error registering new User!');
     }
