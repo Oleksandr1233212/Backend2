@@ -9,7 +9,7 @@ let app = Express();
 
 app.use(cors());
 
-const { CONNECTION_STRING } = require('./config');
+const { CONNECTION_STRING } = require('./config/database.js');
 
 
 
