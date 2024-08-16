@@ -19,7 +19,9 @@ const registerUser = async (req, res) => {
 };
 
 const loginUser = async (req, res) => {
+    
     try {
+        console.log('prischlo')
         const { username, password } = req.body;
         if (!username || !password) {
             return res.status(400).send('UserName and Password are required!');
