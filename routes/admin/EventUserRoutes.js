@@ -1,10 +1,10 @@
 
 const express = require('express');
-const Course = require('../controllers/CourceController');
+const EventUserAdmin = require('../controllers/admin/EventsUsersController.js');
 const multer = require('multer');
 const {findd} = require('../middleware/Cources')
 const router = express.Router();
-router.get('/courses', findd(Course))
+router.get('/courses', findd(EventUserAdmin))
 // router.get('/get', getTasks);
 // router.get('/data/:id', getTaskById);
 // router.post('/add', multer().none(), addTask);

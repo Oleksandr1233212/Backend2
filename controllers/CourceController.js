@@ -65,13 +65,5 @@ const Course = require('../modeles/CourceModele');
 //         res.status(500).send("Error updating task.");
 //     }
 // };
-const find = async (req,res) =>{
-    try{
-        console.log('good')
-        const Coursec = await Course.find({})
-        res.json(Coursec)
-    } catch(error){
-        res.json('Something went wrong')
-    }
-}
-module.exports = { find };
+
+module.exports =  Course ;
