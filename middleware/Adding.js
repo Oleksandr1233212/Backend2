@@ -16,3 +16,4 @@ const Adding = (Model) =>{
     }
     
 }
+module.exports = {Adding}

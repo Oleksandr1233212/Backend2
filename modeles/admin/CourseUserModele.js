@@ -7,8 +7,8 @@ const taskSchema = new mongoose.Schema({
    
     
     courseid: {type: String, required: true},
-    userid:{type:Int32Array,required:true},
-    idcolumn
+    userid:{type:Number,required:true},
+    idcolumn:{type:Number,required:true}
     
 });
 

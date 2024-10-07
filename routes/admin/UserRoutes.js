@@ -1,10 +1,10 @@
 
 const express = require('express');
-const UserAdmin = require('../controllers/admin/UserController.js');
+const UserAdmin = require('../../controllers/admin/UsersController.js');
 const multer = require('multer');
-const {findd} = require('../middleware/Cources')
+const {findd} = require('../../middleware/Cources')
 const router = express.Router();
-router.get('/courses', findd(UserAdmin))
+router.get('/user', findd(UserAdmin))
 // router.get('/get', getTasks);
 // router.get('/data/:id', getTaskById);
 // router.post('/add', multer().none(), addTask);
