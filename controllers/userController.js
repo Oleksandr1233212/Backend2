@@ -34,7 +34,7 @@ const loginUser = async (req, res) => {
         if (!isPasswordValid) {
             return res.status(401).send("Invalid Password!");
         }
-        res.json({ message: "Login Successful!", userId: user._id, userName: user.username });
+        res.json({ message: "Login Successful!", userId: user._id, userName: user.username, userrole: user.role });
     } catch (error) {
         res.status(500).send('Error Login!');
     }
