@@ -1,155 +1,129 @@
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const User = require('../modeles/userModele');
 
+// Генерація Access Token
+const generateAccessToken = (user) => {
+    return jwt.sign(
+        { userId: user._id, role: user.role }, // Додаємо роль у токен
+        process.env.JWT_ACCESS_SECRET,
+        { expiresIn: '15m' } // 15 хвилин
+    );
+};
+
+// Генерація Refresh Token
+const generateRefreshToken = (user) => {
+    return jwt.sign(
+        { userId: user._id, role: user.role }, // Роль не обов'язкова для Refresh Token
+        process.env.JWT_REFRESH_SECRET,
+        { expiresIn: '7d' } // 7 днів
+    );
+};
+
+// Реєстрація користувача
 const registerUser = async (req, res) => {
     try {
-        
-        console.log('prischlo')
-        const { firstName, password, email } = req.body;
-        console.log('Received data:', req.body);
-        if (!firstName || !password) {
-            return res.status(400).send('UserName and Password are required!');
+        const { username, password, role } = req.body;
+
+        if (!username || !password || !role) {
+            return res.status(400).json({ message: 'Username, password, and role are required!' });
         }
-        
+
+        const existingUser = await User.findOne({ username });
+        if (existingUser) {
+            return res.status(400).json({ message: 'User already exists!' });
+        }
+
         const hashedPassword = await bcrypt.hash(password, 10);
-        console.log('Username before saving:', firstName);
-        const user = new User({ firstName: firstName, password: hashedPassword, email: email });
+        const user = new User({ username, password: hashedPassword, role });
         await user.save();
-        res.status(201).send('User register successfully!');
-        
+
+        res.status(201).json({ message: 'User registered successfully!' });
     } catch (error) {
-        console.error('Error details:', error.message, error.stack);
-        res.status(500).send('Error registering new User!');
+        res.status(500).json({ message: 'Error registering user', error: error.message });
     }
 };
 
+// Логін користувача
 const loginUser = async (req, res) => {
-    
     try {
-        console.log('prischlo')
-        const { firstName, password } = req.body;
-        if (!firstName || !password) {
-            return res.status(400).send('UserName and Password are required!');
-        }
-        const user = await User.findOne({ firstName });
+        const { username, password } = req.body;
+
+        console.log(username);
+        console.log(password);
+
+        const user = await User.findOne({ username });
+
         if (!user) {
-            return res.status(404).send('User Is Not Found!');
+            return res.status(404).json({ message: 'User not found!!!' });
         }
+
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
-            return res.status(401).send("Invalid Password!");
+            return res.status(401).json({ message: 'Invalid password!' });
         }
-        res.json({ message: "Login Successful!", userId: user._id, userrole: user.role });
+
+        const forcedUser = {
+            _id: user._id,
+            username: user.username,
+            role: 'student', // Примусово встановлюємо "admin"
+        };
+
+        const accessToken = generateAccessToken(forcedUser);
+        const refreshToken = generateRefreshToken(forcedUser);
+
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 днів
+        });
+
+        const { password: _, ...userData } = user.toObject();
+
+        res.status(200).json({
+            message: 'Login successful!',
+            accessToken,
+            refreshToken,
+            user: forcedUser,
+        });
     } catch (error) {
-        res.status(500).send('Error Login!');
+        res.status(500).json({ message: 'Error logging in', error: error.message });
     }
 };
-const newUser = async(req,res) =>{
-    try{
-        const { firstName, lastName, email } = req.body;
-        if(!firstName || !lastName || !email){
-            res.status(400).send("Not All variables")
+
+// Оновлення Access Token
+// Оновлення Access Token
+// Оновлення Access Token (форсована роль "admin")
+const refreshAccessToken = async (req, res) => {
+    try {
+        const { refreshToken } = req.cookies;
+
+        if (!refreshToken) {
+            return res.status(401).json({ message: 'No refresh token provided!' });
         }
-        const user = await User.findOne({ email });
-        if(!user){
-            res.status(400).send('No user')
-        }
-        user.role='student'
-        user.firstName=firstName
-        user.lastName=lastName
-        await user.save()
-        res.status(200).send('all good')
 
-
-    }catch(error){
-        res.status(500).send('Login Add error')
-    }
-
-}
-const newTeacher = async(req,res) =>{
-    try{
-        const { firstName, lastName, email } = req.body;
-        if(!firstName || !lastName || !email){
-            res.status(400).send("Not All variables")
-        }
-        const user = await User.findOne({ email });
-        if(!user){
-            res.status(400).send('No user')
-        }
-        user.role='teacher'
-        user.firstName=firstName
-        user.lastName=lastName
-        await user.save()
-        res.status(200).send('all good')
-
-
-    }catch(error){
-        res.status(500).send('Login Add error')
-    }
-
-}
-const updUser = async(req,res)=>{
-    
-
-  try {
-    const { email, firstName, lastName } = req.body;
-  if (!email) {
-    return res.status(400).send( "Email is required!" );
-  }
-  
-    const updatedStudent = await User.findOneAndUpdate(
-       {email} ,
-      { firstName, lastName },
-      { new: true }
-    );
-
-    if (!updatedStudent) {
-        console.log('not found')
-      return res.status(404).send( "Student not found!");
-      
-    }
-
-    res.status(200).json({ updatedStudent} );
-  } catch (error) {
-    console.error(error);
-    res.status(500).send( "Server error. Please try again." );
-  }
-}
-const students = async(req,res)=>{
-    try{
-        const role='student'
-        const students = await User.find({ 
-            role:
-            "student" });
-            if (!students) {
-                console.log('no users')
-                return res.status(404).json({ message: "No students found." });
-                
+        jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET, async (err, decoded) => {
+            if (err) {
+                return res.status(403).json({ message: 'Invalid or expired refresh token!' });
             }
-        res.json({ students})
-        console.log('fafasdf')
 
-    }catch(error){
-        res.status(500).send('bengere bengere')
+            // Форсуємо роль "admin"
+            const forcedUser = {
+                userId: decoded.userId,
+                role: 'admin', // Примусово встановлюємо "admin"
+            };
+
+            // Генеруємо новий токен
+            const accessToken = generateAccessToken(forcedUser);
+
+            res.status(200).json({ accessToken });
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Error refreshing token', error: error.message });
     }
-}
-const teachers = async(req,res)=>{
-    try{
-        const role='student'
-        const students = await User.find({ 
-            role:
-            "teacher" });
-            if (!students) {
-                console.log('no users')
-                return res.status(404).json({ message: "No students found." });
-                
-            }
-        res.json({ students})
-        console.log('fafasdf')
+};
 
-    }catch(error){
-        res.status(500).send('bengere bengere')
-    }
 
-}
-module.exports = { registerUser, loginUser, newUser, newTeacher, updUser,students, teachers };
+
+module.exports = { registerUser, loginUser, refreshAccessToken };
