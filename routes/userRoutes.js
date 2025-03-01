@@ -1,6 +1,6 @@
 const express = require('express');
 const multer = require('multer');
-const { registerUser, loginUser, refreshAccessToken } = require('../controllers/userController');
+const { registerUser, loginUser, refreshAccessToken, users } = require('../controllers/userController');
 const { verifyToken } = require('../middleware/authMiddleware');
 const { checkRole } = require('../middleware/roleMiddleware');
 
@@ -50,7 +50,7 @@ const router = express.Router();
  *         description: Server error
  */
 router.post('/register', multer().none(), registerUser);
-
+router.get('/users', multer().none(), users);
 // Логін користувача
 /**
  * @swagger

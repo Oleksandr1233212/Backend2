@@ -10,7 +10,17 @@ const generateAccessToken = (user) => {
         { expiresIn: '15m' } // 15 хвилин
     );
 };
+const users=async (req,res)=>{
+    try{
+        console.log('fafa')
+        const users = await User.find({})
+        console.log(users)
+        res.json(users)
 
+    }catch(error){
+        res.status(500).json({ message: 'Something went wrong' });
+    }
+}
 // Генерація Refresh Token
 const generateRefreshToken = (user) => {
     return jwt.sign(
@@ -24,6 +34,9 @@ const generateRefreshToken = (user) => {
 const registerUser = async (req, res) => {
     try {
         const { username, password, role } = req.body;
+        console.log(username)
+        console.log(password)
+        console.log(role)
 
         if (!username || !password || !role) {
             return res.status(400).json({ message: 'Username, password, and role are required!' });
@@ -66,7 +79,7 @@ const loginUser = async (req, res) => {
         const forcedUser = {
             _id: user._id,
             username: user.username,
-            role: 'student', // Примусово встановлюємо "admin"
+            role: 'admin', // Примусово встановлюємо "admin"
         };
 
         const accessToken = generateAccessToken(forcedUser);
@@ -126,4 +139,4 @@ const refreshAccessToken = async (req, res) => {
 
 
 
-module.exports = { registerUser, loginUser, refreshAccessToken };
+module.exports = { registerUser, loginUser, refreshAccessToken, users };
