@@ -5,7 +5,7 @@ const { findd } = require('../middleware/Cources');
 const CourseController = require('../controllers/CourceController');
 const TeamController = require('../controllers/TeamController');
 const TestimonialController = require('../controllers/TestimonialController');
-
+const CourceController = require('../controllers/CourseController');
 const router = express.Router();
 
 /**
@@ -43,7 +43,7 @@ const router = express.Router();
  *                     example: Learn the basics of programming.
  */
 router.get('/courses', findd(CourseController));
-
+router.get('/cources', findd(CourceController));
 // Маршрут для отримання інформації про команду
 /**
  * @swagger
@@ -100,7 +100,7 @@ router.get('/team', findd(TeamController));
  *                     type: string
  *                     example: Great course!
  */
-router.get('/testimonials', findd(TestimonialController));
+router.get('/testim', findd(TestimonialController));
 
 
 // Маршрут для отримання загальної інформації
