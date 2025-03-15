@@ -1,0 +1,91 @@
+
+Схема роботи з JWT для фронтенду та бекенду
+    1. Загальна структура роботи з JWT
+        Токени:
+        Access Token:
+        Використовується для автентифікації запитів до захищених ресурсів.
+        Зберігається на клієнті (наприклад, у пам’яті або localStorage/sessionStorage).
+        Має короткий термін життя (зазвичай 15 хвилин).
+        Refresh Token:
+        Використовується для отримання нового Access Token, коли поточний Access Token закінчується.
+        Зберігається у HTTP-only куках для безпеки.
+        Має довший термін життя (зазвичай 7 днів або більше).
+
+    2. Як зберігаються токени
+        Access Token:
+        Може зберігатися в:
+        Пам’яті браузера (змінна, Redux, Vuex тощо).
+        localStorage/sessionStorage (небезпечніше через ризик XSS-атак).
+        Refresh Token:
+        Завжди зберігається у HTTP-only куках, щоб:
+        Забезпечити захист від XSS-атак.
+        Заборонити доступ до куків через JavaScript.
+
+    3. Як передаються токени
+        Access Token:
+        Передається у заголовку Authorization:
+
+        http
+       
+        Authorization: Bearer <access_token>
+        Refresh Token:
+        Передається автоматично браузером у куках під час запиту до сервера (через HTTP-only cookie).
+
+    4. Алгоритм роботи з токенами
+        1. Логін користувача:
+        Клієнт надсилає username та password до бекенду.
+        Бекенд:
+        Перевіряє дані користувача.
+        Генерує:
+        Access Token.
+        Refresh Token.
+        Відправляє Access Token у відповідь та зберігає Refresh Token у куках.
+
+        2. Доступ до захищених ресурсів:
+        Клієнт бере Access Token (з пам'яті або localStorage) і надсилає його в запиті:
+
+        http
+        
+        GET /api/protected-resource
+        Authorization: Bearer <access_token>
+        Бекенд:
+
+        Перевіряє Access Token.
+        Якщо Access Token дійсний, обробляє запит.
+        Якщо Access Token закінчився, повертає помилку 401 Unauthorized.
+
+        3. Оновлення Access Token:
+        Якщо Access Token закінчився:
+        Клієнт надсилає запит до маршруту /refresh.
+        Refresh Token автоматично передається браузером у куках.
+        http
+        
+        GET /api/auth/refresh
+        Бекенд:
+        Перевіряє Refresh Token.
+        Генерує новий Access Token.
+        Повертає Access Token клієнту.
+
+
+
+7. Висновок
+Access Token:
+
+Зберігається в пам’яті або localStorage.
+Використовується в заголовках для доступу до API.
+Refresh Token:
+
+Зберігається в HTTP-only куках.
+Використовується для отримання нового Access Token.
+Оновлення токенів:
+
+Фронтенд надсилає запит до /refresh.
+Сервер повертає новий Access Token.
+Відстеження закінчення Access Token:
+
+Сервер повертає 401 Unauthorized.
+Фронтенд виконує запит /refresh.
+
+
+
+    
