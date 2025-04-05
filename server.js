@@ -18,7 +18,7 @@ const app = express();
 
 // Middleware
 app.use(cors({
-    origin: '*', // або '*', якщо відкритий
+    origin: 'http://68.183.217.195', // або '*', якщо відкритий
   }));
 app.use(express.json());
 app.use(cookieParser());
