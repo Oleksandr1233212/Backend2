@@ -33,7 +33,7 @@ app.use('/api/auth/admin', adminRoutes); // Захищені маршрути д
 app.use('/api/auth/teacher', teacherRoutes); // Захищені маршрути для вчителя
 app.use('/api/auth/student', studentRoutes); // Захищені маршрути для студента
 app.use(cors({
-    origin: 'http://68.183.217.195',
+    origin: 'http://68.183.217.195/',
     credentials: true, // якщо використовуються куки
   }));
 // Підключення до бази даних
