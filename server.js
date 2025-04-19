@@ -15,7 +15,7 @@ const studentRoutes = require('./routes/studentRoutes'); // Захищені м�
 const { swaggerUi, swaggerDocs } = require('./swagger');
 
 const app = express();
-
+app.use(cors());
 // Middleware
 
 app.use(express.json());
@@ -32,11 +32,7 @@ app.use('/api/auth', userRoutes); // Логін, реєстрація, рефр�
 app.use('/api/auth/admin', adminRoutes); // Захищені маршрути для адміністратора
 app.use('/api/auth/teacher', teacherRoutes); // Захищені маршрути для вчителя
 app.use('/api/auth/student', studentRoutes); // Захищені маршрути для студента
-// app.use(cors({
-//     origin: 'http://68.183.217.195/',
-//     credentials: true, // якщо використовуються куки
-//   }));
-app.use(cors());
+
 
 // Підключення до бази даних
 const PORT = process.env.PORT || 5048;
